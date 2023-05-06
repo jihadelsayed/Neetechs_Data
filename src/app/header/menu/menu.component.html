@@ -1,0 +1,11 @@
+<ul class="flex flex-col mt-4 font-medium lg:flex-row lg:mt-0">
+  <li *ngFor="let url of menu" [ngClass]="{ 'selected': url.routerLink === currentRoute }">
+    <a [routerLink]="[url.routerLink]"
+      [ngClass]="styleModeService.mode === 'light' ?
+        'block py-2 px-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:py-0 lg:px-4' :
+        'block py-2 px-4 border-b lg:border-0 lg:py-0 lg:px-4 text-gray-400 lg:hover:text-white hover:bg-gray-700 hover:text-white lg:hover:bg-transparent border-gray-700'"
+    >
+      {{ menuTranslations[currentLang][url.title] }}
+    </a>
+  </li>
+</ul>

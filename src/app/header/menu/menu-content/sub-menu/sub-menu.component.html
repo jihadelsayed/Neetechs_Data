@@ -1,0 +1,17 @@
+<div class="py-3 overflow-y-auto whitespace-nowrap scroll-hidden bg-gray-900" >
+    <a *ngFor="let subMenu of menu" [ngClass]="styleModeService.mode === 'light' ?
+    'mx-4 text-sm leading-5 text-gray-700 transition-colors duration-200 transform hover:text-blue-600 hover:underline md:my-0' :
+    'mx-4 text-sm leading-5 transition-colors duration-200 transform text-gray-200 hover:text-blue-400 hover:underline md:my-0'"
+      [routerLink]=[subMenu.routerLink]
+      >
+      <span  [ngClass]="{ 'selected': subMenu.routerLink === currentRoute }">
+          {{ subMenu['name'] }}
+      </span>
+    </a>
+</div>
+
+<div *ngIf="!currentRoute">
+  <p>{{introduction.name}}</p>
+  <p>{{introduction.example}}</p>
+  <p>{{introduction.description}}</p>
+</div>

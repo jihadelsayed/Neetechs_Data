@@ -1,0 +1,11 @@
+
+
+<ng-container *ngIf="introduction">
+  <p>{{introduction.name}}</p>
+  <p>{{introduction.example}}</p>
+  <p>{{introduction.description}}</p>
+</ng-container>
+<!-- <router-outlet></router-outlet> -->
+<div *ngIf="!introduction">
+  there is no data to display
+</div>
