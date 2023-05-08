@@ -20,6 +20,8 @@ export const environment = {
   //MainDomain: window.location.hostname.replace(/^[^.]+./, ''),
   LoginURL: "https://accounts." + window.location.hostname.split(".")[1]+"."+window.location.hostname.split(".")[2] +"/",
   //LoginURL: "https://accounts.theislamicnation.com/",
+  JSON_URL: 'https://raw.githubusercontent.com/jihadelsayed/neetechs/main/json/',
+
 };
 
 /*
