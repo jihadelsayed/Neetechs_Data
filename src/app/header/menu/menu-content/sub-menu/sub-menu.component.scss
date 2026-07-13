@@ -1,3 +1,25 @@
-.selected {
-  background-color: rgb(95, 50, 118);
-  }
+.nt-data-subnav {
+  display: flex;
+  gap: var(--nt-space-1);
+  padding: var(--nt-space-2) var(--nt-page-padding-md);
+  overflow-x: auto;
+  border-block-end: 1px solid var(--nt-border-subtle);
+  background: var(--nt-bg-surface);
+}
+
+.nt-data-subnav .nt-menu__item {
+  width: auto;
+  min-width: max-content;
+}
+
+.nt-data-subnav--status {
+  min-height: var(--nt-control-height-lg);
+}
+
+.nt-data-subnav--status .nt-skeleton {
+  width: min(20rem, 70vw);
+}
+
+.nt-data-introduction {
+  margin: var(--nt-page-padding-md);
+}

@@ -1,0 +1,7 @@
+.nt-data-app {
+  min-height: 100vh;
+}
+
+.nt-data-app__content {
+  min-height: calc(100vh - var(--nt-header-height));
+}

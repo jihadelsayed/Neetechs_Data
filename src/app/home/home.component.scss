@@ -1,3 +1,38 @@
-p{
-  color:red;
+.nt-home {
+  padding-block: var(--nt-space-10);
+}
+
+.nt-home__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--nt-space-4);
+  padding: clamp(var(--nt-space-6), 6vw, var(--nt-space-12));
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, var(--nt-accent-subtle), transparent 42%),
+    var(--nt-bg-surface);
+}
+
+.nt-home__hero h1,
+.nt-home__hero p {
+  max-width: 48rem;
+  margin: 0;
+}
+
+.nt-home__feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--nt-border-interactive);
+  border-radius: var(--nt-radius-lg);
+  background: var(--nt-accent-subtle);
+  color: var(--nt-accent-text);
+}
+
+.nt-home__feature-icon svg {
+  width: 1.4rem;
+  height: 1.4rem;
 }

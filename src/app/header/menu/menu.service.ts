@@ -1,31 +1,62 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class MenuService {
-  constructor(@Inject(LOCALE_ID) public localeId: string, private httpClient: HttpClient) { }
-  currentLang = this.localeId || 'en'; // or 'ar'
-  getMenus() {
-    return this.httpClient.get(
-      environment.JSON_URL
-    +environment.JSON_URL.substring(environment.JSON_URL.lastIndexOf('/') + 1)
-    +'.'+
-    +this.currentLang+'.json');
-  }
-  getMenu(menuURL) {
-    return this.httpClient.get(environment.JSON_URL+menuURL+ '/'+ menuURL+'.'+this.currentLang+'.json');
-  }
-  getSubMenu(menuURL, subMenuURL) {
-    return this.httpClient.get(environment.JSON_URL+menuURL+ '/'+ subMenuURL + '/'+ subMenuURL+'.'+this.currentLang+'.json');
-  }
-  getAside(menuURL, subMenuURL, asideBarURL) {
-    return this.httpClient.get(environment.JSON_URL+menuURL+ '/'+ subMenuURL + '/'+ asideBarURL+ '/'+ asideBarURL+'.'+this.currentLang+'.json');
-  }
-  getSubAside(menuURL, subMenuURL, asideBarURL, subAsideBarURL) {
-    return this.httpClient.get(environment.JSON_URL+menuURL+ '/'+ subMenuURL+'/'+ asideBarURL+'/'+ subAsideBarURL + '/'+ subAsideBarURL+'.'+this.currentLang+'.json');
-  }
+export interface NavigationItem {
+  name: string;
+  routerLink: string;
 }
 
+export interface NavigationIntroduction {
+  name?: string;
+  example?: string;
+  description?: string;
+}
+
+export interface NavigationResponse {
+  data: NavigationItem[];
+  introduction?: NavigationIntroduction;
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class MenuService {
+  private readonly currentLang: string;
+
+  constructor(
+    @Inject(LOCALE_ID) localeId: string,
+    private readonly httpClient: HttpClient,
+  ) {
+    this.currentLang = localeId.split('-')[0] || 'en';
+  }
+
+  getMenu(menuUrl: string): Observable<NavigationResponse> {
+    return this.getNavigation([menuUrl], menuUrl);
+  }
+
+  getSubMenu(menuUrl: string, subMenuUrl: string): Observable<NavigationResponse> {
+    return this.getNavigation([menuUrl, subMenuUrl], subMenuUrl);
+  }
+
+  getAside(menuUrl: string, subMenuUrl: string, asideUrl: string): Observable<NavigationResponse> {
+    return this.getNavigation([menuUrl, subMenuUrl, asideUrl], asideUrl);
+  }
+
+  getSubAside(
+    menuUrl: string,
+    subMenuUrl: string,
+    asideUrl: string,
+    subAsideUrl: string,
+  ): Observable<NavigationResponse> {
+    return this.getNavigation([menuUrl, subMenuUrl, asideUrl, subAsideUrl], subAsideUrl);
+  }
+
+  private getNavigation(path: string[], fileName: string): Observable<NavigationResponse> {
+    const safePath = path.map(segment => encodeURIComponent(segment)).join('/');
+    const safeFileName = encodeURIComponent(fileName);
+    const url = `${environment.JSON_URL}${safePath}/${safeFileName}.${this.currentLang}.json`;
+    return this.httpClient.get<NavigationResponse>(url);
+  }
+}

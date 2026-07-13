@@ -1,17 +1,43 @@
-<div class="py-3 overflow-y-auto whitespace-nowrap scroll-hidden bg-gray-900" >
-    <a *ngFor="let subMenu of menu" [ngClass]="styleModeService.mode === 'light' ?
-    'mx-4 text-sm leading-5 text-gray-700 transition-colors duration-200 transform hover:text-blue-600 hover:underline md:my-0' :
-    'mx-4 text-sm leading-5 transition-colors duration-200 transform text-gray-200 hover:text-blue-400 hover:underline md:my-0'"
-      [routerLink]=[subMenu.routerLink]
-      >
-      <span  [ngClass]="{ 'selected': subMenu.routerLink === currentRoute }">
-          {{ subMenu['name'] }}
-      </span>
-    </a>
+<div *ngIf="loading" class="nt-data-subnav nt-data-subnav--status" role="status">
+  <span class="nt-skeleton nt-skeleton--text nt-skeleton--shimmer"></span>
 </div>
 
-<div *ngIf="!currentRoute">
-  <p>{{introduction.name}}</p>
-  <p>{{introduction.example}}</p>
-  <p>{{introduction.description}}</p>
+<div *ngIf="loadError" class="nt-alert nt-alert--danger nt-alert--compact nt-alert--inline" role="alert">
+  <div class="nt-alert__body">
+    <strong class="nt-alert__title" i18n>Navigation unavailable</strong>
+    <span class="nt-alert__description" i18n>We couldn't load this section.</span>
+  </div>
+  <button class="nt-button nt-button--secondary nt-button--sm" type="button" (click)="loadMenu()" i18n>
+    Try again
+  </button>
+</div>
+
+<nav *ngIf="!loading && !loadError && menu.length" class="nt-data-subnav" aria-label="Section navigation" i18n-aria-label>
+  <a
+    *ngFor="let subMenu of menu"
+    class="nt-menu__item"
+    [class.nt-menu__item--active]="subMenu.routerLink === currentRoute"
+    [attr.aria-current]="subMenu.routerLink === currentRoute ? 'page' : null"
+    [routerLink]="[subMenu.routerLink]"
+  >
+    {{ subMenu.name }}
+  </a>
+</nav>
+
+<article *ngIf="!currentRoute && introduction" class="nt-panel nt-panel--flat nt-data-introduction">
+  <div class="nt-panel__body nt-stack nt-stack--sm">
+    <h2 *ngIf="introduction.name" class="nt-panel__title">{{ introduction.name }}</h2>
+    <p *ngIf="introduction.example" class="nt-text-body-sm nt-text-muted">{{ introduction.example }}</p>
+    <p *ngIf="introduction.description" class="nt-text-body-md">{{ introduction.description }}</p>
+  </div>
+</article>
+
+<div
+  *ngIf="!loading && !loadError && !menu.length && !introduction"
+  class="nt-empty-state nt-empty-state--compact"
+>
+  <div class="nt-empty-state__body">
+    <h2 class="nt-empty-state__title" i18n>No content yet</h2>
+    <p class="nt-empty-state__description" i18n>Content for this section will appear here when available.</p>
+  </div>
 </div>

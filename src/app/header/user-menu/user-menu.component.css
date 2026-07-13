@@ -1,3 +1,37 @@
-button{
-  width: 100%!important;
+.nt-user-trigger {
+  max-width: 14rem;
+  min-width: 0;
+  padding-inline: var(--nt-space-2);
+}
+
+.nt-header-popover {
+  position: relative;
+}
+
+.nt-header-popover > summary {
+  list-style: none;
+}
+
+.nt-header-popover > summary::-webkit-details-marker {
+  display: none;
+}
+
+.nt-header-popover__panel {
+  position: absolute;
+  z-index: var(--nt-z-popover, 1000);
+  inset-block-start: calc(100% + var(--nt-space-2));
+  inset-inline-end: 0;
+}
+
+.nt-user-trigger__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 40rem) {
+  .nt-user-trigger__name,
+  .nt-user-trigger .nt-button__icon {
+    display: none;
+  }
 }

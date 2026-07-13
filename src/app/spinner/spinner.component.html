@@ -1,5 +1,16 @@
-<div class="page-overlay-wrapper" *ngIf="showSpinner">
-  <!-- <div class="bee-spinner"></div> -->
-  <mat-spinner color=accent></mat-spinner>
-
+<div
+  *ngIf="showSpinner"
+  class="nt-spinner-overlay"
+  role="status"
+  aria-live="polite"
+  aria-label="Loading"
+  i18n-aria-label
+>
+  <div class="nt-loading-state nt-loading-state--surface nt-loading-state--compact">
+    <span class="nt-loading-state__spinner" aria-hidden="true"></span>
+    <div class="nt-loading-state__body">
+      <p class="nt-loading-state__title" i18n>Loading</p>
+      <p class="nt-loading-state__description" i18n>Please wait while the latest data is prepared.</p>
+    </div>
+  </div>
 </div>

@@ -1,32 +1,26 @@
-import { Component, Input, OnInit } from '@angular/core';
-
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-selection-loader',
-    //templateUrl: './selection-loader.component.html',
-
   template: `
-    <div [ngStyle]="getMyStyles()" class="skelt-load loader"></div>
+    <span
+      class="nt-skeleton nt-skeleton--shimmer"
+      [class.nt-skeleton--circle]="circle"
+      [ngStyle]="styles"
+      aria-hidden="true"
+    ></span>
   `,
-  styleUrls: ['./selection-loader.component.css']
+  styleUrls: ['./selection-loader.component.css'],
 })
-export class SelectionLoaderComponent implements OnInit {
-  @Input() Cwidth;
-  @Input() Cheight;
-  @Input() circle;
+export class SelectionLoaderComponent {
+  @Input() Cwidth = '100%';
+  @Input() Cheight = '1rem';
+  @Input() circle = false;
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
-  getMyStyles() {
-    const myStyles = {
-        'width': this.Cwidth ? this.Cwidth : '%',
-        'height': this.Cheight ? this.Cheight : '%',
-        'border-radius': this.circle ? '50%' : ''
+  get styles(): Record<string, string> {
+    return {
+      width: this.Cwidth,
+      height: this.Cheight,
     };
-    return myStyles;
-}
-
+  }
 }

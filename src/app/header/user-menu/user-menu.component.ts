@@ -1,57 +1,60 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit, LOCALE_ID, Inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Inject, LOCALE_ID } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { StyleModeService } from '../style-mode.service';
+import { UserInfo } from '../../authorization/user.model';
 
 @Component({
   selector: 'app-user-menu',
   templateUrl: './user-menu.component.html',
-  styleUrls: ['./user-menu.component.css']
+  styleUrls: ['./user-menu.component.css'],
 })
-export class UserMenuComponent implements OnInit {
-  userInfo = JSON.parse(localStorage.getItem('UserInfo')!);
-  //authenticateHttpHeaders = new HttpHeaders({ 'Authorization': 'Token ' + localStorage.getItem('userToken') });
+export class UserMenuComponent {
+  readonly userInfo = this.readUserInfo();
+  readonly accountUrl = environment.LoginURL.replace('accounts.', 'myaccount.');
 
-  darkMode: boolean = false;
-  constructor(
-    private http: HttpClient,
-    public styleModeService: StyleModeService,
-    ) { }
+  constructor(@Inject(LOCALE_ID) private readonly localeId: string) {}
 
-  ngOnInit(): void {
-    const valueFromLocalStorage = localStorage.getItem('darkMode');
-
-    if (valueFromLocalStorage === null) {
-      // handle the case where the value is not found in local storage
-    } else {
-      // pass the value to the function as a string
-      let darkModeValue = JSON.parse(valueFromLocalStorage);
-      if (darkModeValue === null) {
-        darkModeValue = false;
-      }
-
-      this.darkMode = darkModeValue;
-    }
-
-
+  get displayName(): string {
+    return this.userInfo?.first_name
+      || this.userInfo?.username
+      || this.userInfo?.email
+      || $localize`Neetechs user`;
   }
 
-  toggleDarkMode() {
-    this.styleModeService.setDarkMode(!this.darkMode)
+  get email(): string {
+    return this.userInfo?.email || $localize`Signed in`;
   }
-  Logout() {
+
+  get initials(): string {
+    const parts = this.displayName.trim().split(/\s+/).filter(Boolean);
+    return parts.slice(0, 2).map(part => part[0]).join('').toUpperCase() || 'N';
+  }
+
+  logout(): void {
     localStorage.removeItem('userToken');
     localStorage.removeItem('UserInfo');
-    window.location.href = environment.LoginURL + 'ar/#/signOut' + "?" + "host=" + window.location.host + "&" + "language=" + window.navigator.language.slice(0, 2) + "&" + "pathname=" + window.location.pathname;
 
+    const language = this.localeId.split('-')[0] || 'en';
+    const parameters = new URLSearchParams({
+      host: window.location.host,
+      language,
+      pathname: window.location.pathname,
+    });
+
+    window.location.href = `${environment.LoginURL}${language}/#/signOut?${parameters.toString()}`;
   }
-  // Subscription() {
-  //   this.http.get(environment.SERVER_URL + 'api/customerPortal', { headers: this.authenticateHttpHeaders })
-  //     .subscribe((portalUrl: any) => {
-  //       // console.log(portalUrl)
-  //       window.location.href = portalUrl[0]
-  //       //this.router.navigate(['/login']);
-  //     });
-  // }
+
+  private readUserInfo(): Partial<UserInfo> | null {
+    const stored = localStorage.getItem('UserInfo');
+
+    if (!stored) {
+      return null;
+    }
+
+    try {
+      const value: unknown = JSON.parse(stored);
+      return typeof value === 'object' && value !== null ? value as Partial<UserInfo> : null;
+    } catch {
+      return null;
+    }
+  }
 }

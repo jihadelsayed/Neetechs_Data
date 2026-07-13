@@ -1,22 +1,30 @@
-import { Component, OnInit, LOCALE_ID, Inject } from '@angular/core';
+import { Component, Inject, LOCALE_ID } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { StyleModeService } from '../style-mode.service';
 
 @Component({
   selector: 'app-login-menu',
   templateUrl: './login-menu.component.html',
-  styleUrls: ['./login-menu.component.scss']
+  styleUrls: ['./login-menu.component.scss'],
 })
-export class LoginMenuComponent implements OnInit {
+export class LoginMenuComponent {
+  constructor(@Inject(LOCALE_ID) public readonly localeId: string) {}
 
-  constructor(@Inject(LOCALE_ID) public localeId: string, public styleModeService: StyleModeService) { }
+  get loginUrl(): string {
+    return this.accountUrl('signIn');
+  }
 
-  ngOnInit(): void {
+  get signUpUrl(): string {
+    return this.accountUrl('signUp');
   }
-  logIn() {
-    window.location.href = environment.LoginURL + window.navigator.language.slice(0, 2)+'/#/signIn' + "?" + "host=" + window.location.host + "&" + "language=" + window.navigator.language.slice(0, 2) + "&" + "pathname=" + window.location.pathname;
-  }
-  SignUp() {
-    window.location.href = environment.LoginURL + window.navigator.language.slice(0, 2)+'/#/signUp' + "?" + "host=" + window.location.host + "&" + "language=" + window.navigator.language.slice(0, 2) + "&" + "pathname=" + window.location.pathname;
+
+  private accountUrl(route: 'signIn' | 'signUp'): string {
+    const language = this.localeId.split('-')[0] || 'en';
+    const parameters = new URLSearchParams({
+      host: window.location.host,
+      language,
+      pathname: window.location.pathname,
+    });
+
+    return `${environment.LoginURL}${language}/#/${route}?${parameters.toString()}`;
   }
 }

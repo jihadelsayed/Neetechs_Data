@@ -1,49 +1,43 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnDestroy } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
 import { menu } from 'src/environments/menu';
 import menuTranslations from 'src/locale/menu.json';
-
-import { LOCALE_ID } from '@angular/core';
-import { StyleModeService } from '../style-mode.service';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.css']
+  styleUrls: ['./menu.component.css'],
 })
+export class MenuComponent implements OnDestroy {
+  readonly currentLang = this.localeId.split('-')[0] || 'en';
+  readonly menu = menu;
+  readonly menuTranslations: Record<string, Record<string, string>> = menuTranslations;
+  currentRoute = '';
+  private readonly destroy$ = new Subject<void>();
 
-export class MenuComponent implements OnInit {
-  currentLang = this.localeId || 'en'; // or 'ar'
-  menu = menu;
-  menuTranslations: any = menuTranslations;
-  currentRoute: any
-
-  constructor(@Inject(LOCALE_ID) public localeId: string,
-    public styleModeService: StyleModeService,
-    private router: Router,
-    private route: ActivatedRoute
+  constructor(
+    @Inject(LOCALE_ID) public readonly localeId: string,
+    private readonly router: Router,
   ) {
+    this.currentRoute = this.router.url.split('/')[1] || '';
     this.router.events.pipe(
-      filter((event: any) => event instanceof NavigationEnd)
-    ).subscribe(
-      event => {
-        //this.router.url.split('/')[1]
-        this.currentRoute = event.url.split('/')[1];
-        console.log(event);
-      });
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      takeUntil(this.destroy$),
+    ).subscribe(event => {
+      this.currentRoute = event.urlAfterRedirects.split('/')[1] || '';
+    });
   }
 
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.currentRoute;
-    });
-    // const urlSegments = this.route.snapshot.url;
-    // if (urlSegments.length > 0) {
-    //   this.currentUrl = urlSegments[0].path;
-    // } else {
-    //   this.currentUrl = '';
-    // }
+  labelFor(title: string): string {
+    return this.menuTranslations[this.currentLang]?.[title]
+      ?? this.menuTranslations['en']?.[title]
+      ?? title;
+  }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

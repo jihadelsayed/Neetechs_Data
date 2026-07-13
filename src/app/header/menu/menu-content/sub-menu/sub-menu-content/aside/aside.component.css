@@ -1,3 +1,27 @@
-.selected {
-  background-color: rgb(28, 77, 33);
+.nt-data-workspace {
+  display: grid;
+  grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+  min-height: calc(100vh - (2 * var(--nt-header-height)));
+}
+
+.nt-data-workspace__sidebar {
+  padding: var(--nt-space-4);
+  border-inline-end: 1px solid var(--nt-border-subtle);
+  background: var(--nt-bg-surface);
+}
+
+.nt-data-workspace__content {
+  min-width: 0;
+  padding: var(--nt-page-padding-md);
+}
+
+@media (max-width: 48rem) {
+  .nt-data-workspace {
+    grid-template-columns: 1fr;
   }
+
+  .nt-data-workspace__sidebar {
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--nt-border-subtle);
+  }
+}

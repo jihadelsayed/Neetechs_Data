@@ -1,59 +1,55 @@
-<div class="grid grid-rows-6 grid-flow-col gap-4">
-  <div class="row-start-1">
+<div class="nt-data-workspace">
+  <aside class="nt-data-workspace__sidebar" aria-label="Content navigation" i18n-aria-label>
+    <div class="nt-sidebar__section">
+      <h2 class="nt-sidebar__section-label" i18n>In this section</h2>
 
-<aside id="default-sidebar" class=" z-40 w-64 h-screen transition-transform  sm:translate-x-0" aria-label="Sidebar">
-  <div [ngClass]="styleModeService.mode === 'light' ?
-      'h-full px-3 py-4 overflow-y-auto bg-gray-50' :
-      'h-full px-3 py-4 overflow-y-auto bg-gray-900'">
-    <ul class="space-y-2 font-medium">
-      <li>
-        <a href="#" [ngClass]="styleModeService.mode === 'light' ?
-          'flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100' :
-          'flex items-center p-2 rounded-lg text-white hover:bg-gray-700'">
-          <svg aria-hidden="true" [ngClass]="styleModeService.mode === 'light' ?
-          'w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900' :
-          'w-6 h-6 transition duration-75 text-gray-400 group-hover:text-white'" fill="currentColor"
-            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-            <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
-          </svg>
-          <span class="ml-3">Introduction</span>
+      <div *ngIf="loading" class="nt-skeleton-stack" role="status" aria-label="Loading navigation" i18n-aria-label>
+        <span class="nt-skeleton nt-skeleton--text nt-skeleton--shimmer"></span>
+        <span class="nt-skeleton nt-skeleton--text nt-skeleton--shimmer"></span>
+      </div>
+
+      <div *ngIf="loadError" class="nt-alert nt-alert--danger nt-alert--compact" role="alert">
+        <div class="nt-alert__body">
+          <span class="nt-alert__description" i18n>Navigation couldn't be loaded.</span>
+        </div>
+        <button class="nt-button nt-button--secondary nt-button--sm" type="button" (click)="loadSubMenu()" i18n>
+          Retry
+        </button>
+      </div>
+
+      <nav *ngIf="!loading && !loadError" class="nt-menu" aria-label="Topics" i18n-aria-label>
+        <a
+          *ngFor="let aside of subMenu"
+          class="nt-menu__item"
+          [class.nt-menu__item--active]="aside.routerLink === currentRoute"
+          [attr.aria-current]="aside.routerLink === currentRoute ? 'page' : null"
+          [routerLink]="[aside.routerLink]"
+        >
+          <span class="nt-menu__item-title">{{ aside.name }}</span>
         </a>
-      </li>
-      <!-- selected -->
-      <li *ngFor="let aside of subMenu" [ngClass]="{ ' bg-gray-700': aside.routerLink === currentRoute }">
-        <a [routerLink]="[aside.routerLink]" [ngClass]="styleModeService.mode === 'light' ?
-          'flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100' :
-          'flex items-center p-2 rounded-lg text-white hover:bg-gray-700'">
-          <svg aria-hidden="true" [ngClass]="styleModeService.mode === 'light' ?
-              'w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900' :
-              'w-6 h-6 transition duration-75 text-gray-400 group-hover:text-white'" fill="currentColor" viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-            </path>
-          </svg>
-          <span class="flex-1 ml-3 whitespace-nowrap">
-            {{ aside['name'] }}
-          </span>
-          <span
-            [ngClass]="styleModeService.mode === 'light' ?
-            'inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-200 rounded-full' :
-            'inline-flex items-center justify-center px-2 ml-3 text-sm font-medium  rounded-full bg-gray-700 text-gray-300'">Pro</span>
-        </a>
-      </li>
-    </ul>
-  </div>
-</aside>
-</div>
-<div class="row-start-1">
-  <div *ngIf="!currentRoute">
-    <p>{{introduction.name}}</p>
-    <p>{{introduction.example}}</p>
-    <p>{{introduction.description}}</p>
-  </div>
-  <div *ngIf="currentRoute">
-    <router-outlet></router-outlet>
-  </div>
-</div>
+      </nav>
+    </div>
+  </aside>
+
+  <section class="nt-data-workspace__content">
+    <article *ngIf="!currentRoute && introduction" class="nt-panel nt-panel--flat">
+      <div class="nt-panel__body nt-stack nt-stack--sm">
+        <h2 *ngIf="introduction.name" class="nt-panel__title">{{ introduction.name }}</h2>
+        <p *ngIf="introduction.example" class="nt-text-body-sm nt-text-muted">{{ introduction.example }}</p>
+        <p *ngIf="introduction.description" class="nt-text-body-md">{{ introduction.description }}</p>
+      </div>
+    </article>
+
+    <div
+      *ngIf="!currentRoute && !loading && !loadError && !introduction"
+      class="nt-empty-state nt-empty-state--compact"
+    >
+      <div class="nt-empty-state__body">
+        <h2 class="nt-empty-state__title" i18n>No topic selected</h2>
+        <p class="nt-empty-state__description" i18n>Select a topic when content becomes available.</p>
+      </div>
+    </div>
+
+    <router-outlet *ngIf="currentRoute"></router-outlet>
+  </section>
 </div>

@@ -1,1 +1,9 @@
-<iframe style="display:none;" src="{{frameSrc}}" id="iframeAccount"></iframe>
+<iframe
+  #accountFrame
+  class="nt-auth-frame"
+  [src]="frameSrc"
+  title="Neetechs account authorization"
+  i18n-title
+  tabindex="-1"
+  aria-hidden="true"
+></iframe>

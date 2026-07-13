@@ -1,49 +1,38 @@
-import { LOCALE_ID, Inject, Injectable } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-  HttpErrorResponse,
-
-} from '@angular/common/http';
-
-import { catchError, Observable, throwError } from 'rxjs';
-import { StyleModeService } from '../header/style-mode.service';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { Inject, Injectable, LOCALE_ID } from '@angular/core';
+import { Observable, catchError, throwError } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-
-  constructor(@Inject(LOCALE_ID) public localeId: string, public styleModeService: StyleModeService) { }
+  constructor(@Inject(LOCALE_ID) private readonly localeId: string) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    const token = localStorage.getItem('userToken');
+    const authenticatedRequest = token && request.url.startsWith(environment.SERVER_URL)
+      ? request.clone({ setHeaders: { Authorization: `Token ${token}` } })
+      : request;
 
-    const customReq = request.clone({});
-    return next.handle(request).pipe(
+    return next.handle(authenticatedRequest).pipe(
       catchError((error: HttpErrorResponse) => {
-
-        if (error instanceof HttpErrorResponse) {
-         if (error.status === 401 || error.status === 403) {
-            // auto logout if 401 response returned from api
-            localStorage.removeItem('userToken');
-            localStorage.removeItem('UserInfo');
-            const ho = window.location.hostname
-            window.location.replace(
-              "http://accounts." + ho.substring(ho.lastIndexOf(".", ho.lastIndexOf(".") - 1) + 1) || 'neetechs.com'
-              +':' + '80'
-              )
-            //this.router.navigate(['/login']);
-          }
-          //  console.log(error)
-
-          // server error
-          return throwError(error)
-        } else {
-          // client side error
-          return throwError(error)
-
+        if (error.status === 401 || error.status === 403) {
+          localStorage.removeItem('userToken');
+          localStorage.removeItem('UserInfo');
+          this.redirectToAccount();
         }
-      })
+
+        return throwError(() => error);
+      }),
     );
+  }
+
+  private redirectToAccount(): void {
+    const language = this.localeId.split('-')[0] || 'en';
+    const parameters = new URLSearchParams({
+      host: window.location.host,
+      language,
+      pathname: window.location.pathname,
+    });
+    window.location.replace(`${environment.LoginURL}${language}/#/signIn?${parameters.toString()}`);
   }
 }

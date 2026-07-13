@@ -1,11 +1,33 @@
+<div *ngIf="loading" class="nt-loading-state nt-loading-state--compact" role="status">
+  <span class="nt-loading-state__spinner" aria-hidden="true"></span>
+  <div class="nt-loading-state__body">
+    <p class="nt-loading-state__title" i18n>Loading content</p>
+  </div>
+</div>
 
+<div *ngIf="loadError" class="nt-error-state nt-error-state--inline nt-error-state--surface" role="alert">
+  <div class="nt-error-state__body">
+    <h2 class="nt-error-state__title" i18n>Content unavailable</h2>
+    <p class="nt-error-state__description" i18n>We couldn't load this content.</p>
+  </div>
+  <div class="nt-error-state__actions">
+    <button class="nt-button nt-button--secondary nt-button--sm" type="button" (click)="loadContent()" i18n>
+      Try again
+    </button>
+  </div>
+</div>
 
-<ng-container *ngIf="introduction">
-  <p>{{introduction.name}}</p>
-  <p>{{introduction.example}}</p>
-  <p>{{introduction.description}}</p>
-</ng-container>
-<!-- <router-outlet></router-outlet> -->
-<div *ngIf="!introduction">
-  there is no data to display
+<article *ngIf="!loading && !loadError && introduction" class="nt-panel nt-panel--flat">
+  <div class="nt-panel__body nt-stack nt-stack--sm">
+    <h1 *ngIf="introduction.name" class="nt-panel__title">{{ introduction.name }}</h1>
+    <p *ngIf="introduction.example" class="nt-text-body-sm nt-text-muted">{{ introduction.example }}</p>
+    <p *ngIf="introduction.description" class="nt-text-body-md">{{ introduction.description }}</p>
+  </div>
+</article>
+
+<div *ngIf="!loading && !loadError && !introduction" class="nt-empty-state nt-empty-state--compact">
+  <div class="nt-empty-state__body">
+    <h2 class="nt-empty-state__title" i18n>No data to display</h2>
+    <p class="nt-empty-state__description" i18n>This topic does not have published content yet.</p>
+  </div>
 </div>

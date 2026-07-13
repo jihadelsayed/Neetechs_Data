@@ -1,56 +1,63 @@
-import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Subject, filter, takeUntil } from 'rxjs';
-import { MenuService } from 'src/app/header/menu/menu.service';
-import { StyleModeService } from 'src/app/header/style-mode.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { filter, finalize, takeUntil } from 'rxjs/operators';
+import {
+  MenuService,
+  NavigationIntroduction,
+} from '../../../../../menu.service';
 
 @Component({
   selector: 'app-aside-content',
   templateUrl: './aside-content.component.html',
-  styleUrls: ['./aside-content.component.scss']
+  styleUrls: ['./aside-content.component.scss'],
 })
-export class AsideContentComponent implements OnInit {
-  currentRoute:any
-  currentLang = this.localeId || 'en'; // or 'ar'
-  aside: any[];
-  introduction: any;
+export class AsideContentComponent implements OnInit, OnDestroy {
+  introduction: NavigationIntroduction | null = null;
+  loading = false;
+  loadError = false;
+  private readonly destroy$ = new Subject<void>();
 
-  constructor(@Inject(LOCALE_ID) public localeId: string,
-  public styleModeService: StyleModeService,
-  public menuService: MenuService,
-  private router: Router)
-  {
+  constructor(
+    private readonly menuService: MenuService,
+    private readonly router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.loadContent();
     this.router.events.pipe(
-      filter((event:any) => event instanceof NavigationEnd)
-      ).subscribe(
-          event =>
-           {
-            //this.router.url.split('/')[1]
-              this.currentRoute = event.url.split('/')[3];
-              console.log(event);
-              this.getAside()
-           });
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      takeUntil(this.destroy$),
+    ).subscribe(() => this.loadContent());
   }
-  ngOnInit() {
-    let menuURL = window.location.hash.split("/")[1]
-    let subMenuURL = window.location.hash.split("/")[2]
-    let asideURL = window.location.hash.split("/")[3]
-    this.menuService.getAside(menuURL, subMenuURL, asideURL).subscribe(
-      (data: any) => {
-        console.log(data.data)
-        this.aside = data.data
-        this.introduction = data.introduction
-      })
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
-  getAside(){
-    let menuURL = window.location.hash.split("/")[1]
-    let subMenuURL = window.location.hash.split("/")[2]
-    let asideURL = window.location.hash.split("/")[3]
-    this.menuService.getAside(menuURL, subMenuURL, asideURL).subscribe(
-      (data: any) => {
-        console.log(data.data)
-        this.aside = data.data
-        this.introduction = data.introduction
-      })
+
+  loadContent(): void {
+    const segments = this.router.url.split('?')[0].split('/').filter(Boolean);
+
+    if (!segments[0] || !segments[1] || !segments[2]) {
+      this.introduction = null;
+      return;
+    }
+
+    this.loading = true;
+    this.loadError = false;
+    this.menuService.getAside(segments[0], segments[1], segments[2]).pipe(
+      finalize(() => {
+        this.loading = false;
+      }),
+    ).subscribe({
+      next: response => {
+        this.introduction = response.introduction ?? null;
+      },
+      error: () => {
+        this.introduction = null;
+        this.loadError = true;
+      },
+    });
   }
 }
